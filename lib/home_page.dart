@@ -12,9 +12,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var score=0;
+  double birdHeight =0.1;
+  double birdWidth =0.1;
   static double birdYaxis = 0;
   static double barrierXone=0;
   double barrierXtwo=1;
+
+
+  //barier variables-----------------------------------------------
+  static List<double> barrierX=[2,2+1.5];
+  static double barrierWidth=0.5;
+  List<List<double>>barrierHeight=[
+//out of 2, where 2 is the entire height of the screen 
+//[topHeight, bottomHeight]
+[0.6,0.4],
+[0.4,0.6]
+  ];
+
     //equation
   //y=-g/2*time^2+velocity*time
   //i.e height=-4.9*time+ 3*time   here g=-9.8, velocity=3
@@ -59,6 +74,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         if(barrierXone<-1.1){
           barrierXone+=2.2;
+          
         }else{
           barrierXone -=0.1;
       
@@ -68,20 +84,18 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         if(barrierXtwo<-1.1){
           barrierXtwo+=2.2;
+          
         }else{
           barrierXtwo -=0.1;
       
         }
       });
 
-      
+      score+=1;
 
-      // if (birdYaxis > 0.9) {
-      //   timer.cancel();
-      //   print("timer cancel");
-      //   gameHasStarted = false;
-      // }
+      
     });
+    
   }
 
   bool birdDead(){
@@ -89,10 +103,26 @@ class _HomePageState extends State<HomePage> {
     if(birdYaxis<-1|| birdYaxis>1){
       return true;
     }
-    else {
-      return false;
-    }
+
+  // barrier collision----------------------------
+     for(int i=0;i<barrierX.length;i++){
+      if(barrierX[i]<=barrierWidth && 
+      barrierX[i]+ barrierWidth>=-birdWidth &&
+      (birdYaxis<=-1 + barrierHeight[i][0]||
+      birdYaxis+birdHeight>=1-barrierHeight[i][1])){
+        return true;
+      }
+    
   }
+    
+      return false;
+  
+  }
+
+
+
+
+ 
 
   //reset the game
   void resetGame(){
@@ -113,7 +143,12 @@ class _HomePageState extends State<HomePage> {
       return AlertDialog(
         backgroundColor: Colors.brown,
         title: Center(
-          child: Text(" Game Over",style: TextStyle(color: Colors.white),),
+          child: Column(
+            children: [
+              Text(" Game Over",style: TextStyle(color: Colors.white),),
+              Text(score.toString()),
+            ],
+          ),
 
           ),
           actions: [
@@ -150,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment(-0.9, birdYaxis),
                     duration: Duration(milliseconds: 0),
                     color: Colors.blueAccent,
-                    child: MyBird(),
+                    child: MyBird(birdYaxis: birdYaxis,birdHeight: birdHeight,birdWidth: birdWidth,),
                   ),
     
                   //tap to play -TEXT--------
@@ -166,25 +201,36 @@ class _HomePageState extends State<HomePage> {
                   AnimatedContainer(
                     duration: Duration(milliseconds: 0),
                     alignment: Alignment(barrierXone, -1.1),
-                    child: Barrier(size: 100.0),
+                    child: Barrier(
+                      barrierHeight: barrierHeight[0][0],
+                    barrierWidth: barrierWidth,),
                   ),
     
                   AnimatedContainer(
                     duration: Duration(milliseconds: 0),
                     alignment: Alignment(barrierXone, 1.1),
-                    child: Barrier(size: 170.0),
+                    child: Barrier(
+                      barrierHeight: barrierHeight[0][1],
+                    barrierWidth: barrierWidth,
+                    ),
                   ),
     
                   AnimatedContainer(
                     duration: Duration(milliseconds: 0),
                     alignment: Alignment(barrierXtwo, -1.1),
-                    child: Barrier(size: 150.0),
+                    child: Barrier(
+                      barrierHeight: barrierHeight[1][0],
+                    barrierWidth: barrierWidth,
+                    ),
                   ),
     
                   AnimatedContainer(
                     duration: Duration(milliseconds: 0),
                     alignment: Alignment(barrierXtwo, 1.1),
-                    child: Barrier(size: 110.0),
+                    child: Barrier(
+                      barrierHeight: barrierHeight[1][1],
+                    barrierWidth: barrierWidth,
+                    ),
                   ),
                 ],
               )),
@@ -209,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                       
                     ),
                     Text(
-                      "0",
+                      score.toString(),
                       style: const TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -230,7 +276,7 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 25,
                           color: Colors.white
                         )),
-                    Text("0",
+                    Text("10",
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
