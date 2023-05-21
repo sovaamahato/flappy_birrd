@@ -45,6 +45,15 @@ class _HomePageState extends State<HomePage> {
         print("yaxis value=");
         print(birdYaxis);
       });
+
+
+      //check bird dead
+      if(birdDead())
+      {
+        timer.cancel();
+        gameHasStarted=false;
+        _showDialogBox();
+      }
 //this piece of code make to move the poles 
 //and also keeps on adding the poles as the screen moves
       setState(() {
@@ -66,11 +75,58 @@ class _HomePageState extends State<HomePage> {
       });
 
       
-      if (birdYaxis > 0.9) {
-        timer.cancel();
-        print("timer cancel");
-        gameHasStarted = false;
-      }
+
+      // if (birdYaxis > 0.9) {
+      //   timer.cancel();
+      //   print("timer cancel");
+      //   gameHasStarted = false;
+      // }
+    });
+  }
+
+  bool birdDead(){
+    //check if the bird is hitting the top or the bottom of the screen
+    if(birdYaxis<-1|| birdYaxis>1){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  //reset the game
+  void resetGame(){
+    Navigator.pop(context);//dismiss the alert dialog
+    setState(() {
+      birdYaxis =0;
+      gameHasStarted=false;
+      time=0;
+      initialHeight=birdYaxis;
+    });
+  }
+
+
+  //dialog box after game over
+  void _showDialogBox()
+  {
+    showDialog(context: context, builder: (BuildContext context){
+      return AlertDialog(
+        backgroundColor: Colors.brown,
+        title: Center(
+          child: Text(" Game Over",style: TextStyle(color: Colors.white),),
+
+          ),
+          actions: [
+            GestureDetector(
+              onTap: resetGame,
+              child: ClipRRect(borderRadius: BorderRadius.circular(5),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              color: Colors.white,
+              child: Text("Play Again",style: TextStyle(color: Colors.brown),),
+            )),),
+          ],
+      );
     });
   }
 
